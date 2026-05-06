@@ -79,9 +79,9 @@
 // // ===============================
 // const db = mysql.createPool({
 //   host: 'localhost',
-//   user: 'SmeyKh',
-//   password: 'hello123(*)', // change if you have password
-//   database: 'todo_db',
+//   user: 'ok',
+//   password: 'ok(*)', // change if you have password
+//   database: 'ok',
 //   waitForConnections: true,
 //   connectionLimit: 10,
 //   queueLimit: 0
