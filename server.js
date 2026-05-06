@@ -341,9 +341,9 @@ app.delete("/todos/:id", (req, res) => {
 // ===============================
 // SERVER START (CLOUD READY)
 // ===============================
-const HOST = process.env.HOST || ip.address();
+// const HOST = process.env.HOST || ip.address();
 const PORT = process.env.DB_PORT || 3000;
 
-app.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running at http://${HOST}:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running at post${PORT}`);
 });
