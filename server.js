@@ -212,6 +212,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
+const ip = require("ip");
 
 const app = express();
 
@@ -345,7 +346,8 @@ app.delete("/todos/:id", (req, res) => {
 // SERVER START (CLOUD READY)
 // ===============================
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || ip.address();
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(PORT, HOST, () => {
+  console.log(`🚀 Server running at http://${HOST}:${PORT}`);
 });
