@@ -213,6 +213,7 @@ const express = require("express");
 const cors = require("cors");
 const mysql = require("mysql2");
 const ip = require("ip");
+const fs = require("fs");
 
 const app = express();
 
@@ -230,11 +231,11 @@ const db = mysql.createPool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
-
 // ===============================
 // TEST DB CONNECTION
 // ===============================
@@ -246,11 +247,9 @@ db.getConnection((err, connection) => {
     connection.release();
   }
 });
-
 // ===============================
 // ROUTES
 // ===============================
-
 // 🔹 GET all todos
 app.get("/todos", (req, res) => {
   db.query("SELECT * FROM todos", (err, results) => {
@@ -293,7 +292,6 @@ app.post("/todos", (req, res) => {
       if (err) {
         return res.status(500).json({ error: "Insert failed" });
       }
-
       res.status(201).json({
         id: result.insertId,
         name,
@@ -302,7 +300,6 @@ app.post("/todos", (req, res) => {
     }
   );
 });
-
 // 🔹 UPDATE todo
 app.put("/todos/:id", (req, res) => {
   const id = req.params.id;
@@ -341,12 +338,11 @@ app.delete("/todos/:id", (req, res) => {
     res.json({ message: "Deleted successfully" });
   });
 });
-
 // ===============================
 // SERVER START (CLOUD READY)
 // ===============================
-const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || ip.address();
+const PORT = process.env.DB_PORT || 3000;
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Server running at http://${HOST}:${PORT}`);
