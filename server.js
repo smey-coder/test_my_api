@@ -59,38 +59,189 @@
 // console.log(`Server running on http://${HOST}:${PORT}`); 
 // });
 
+
+//Version 01
 //-----------------------------------------
-// Connection with Database MySQL
-const express = require('express');
-const cors = require('cors');
-const ip = require('ip');
-const mysql = require('mysql2');
+// // Connection with Database MySQL
+// const express = require('express');
+// const cors = require('cors');
+// const ip = require('ip');
+// const mysql = require('mysql2');
+
+// const app = express();
+
+// // Middleware
+// app.use(cors());
+// app.use(express.json());
+
+// // ===============================
+// // MySQL Connection (Pool)
+// // ===============================
+// const db = mysql.createPool({
+//   host: 'localhost',
+//   user: 'SmeyKh',
+//   password: 'hello123(*)', // change if you have password
+//   database: 'todo_db',
+//   waitForConnections: true,
+//   connectionLimit: 10,
+//   queueLimit: 0
+// });
+
+// // Test DB connection
+// db.getConnection((err, connection) => {
+//   if (err) {
+//     console.error('❌ Database connection failed:', err);
+//   } else {
+//     console.log('✅ Connected to MySQL');
+//     connection.release();
+//   }
+// });
+
+// // ===============================
+// // ROUTES
+// // ===============================
+
+// // 🔹 GET all todos
+// app.get('/todos', (req, res) => {
+//   db.query('SELECT * FROM todos', (err, results) => {
+//     if (err) {
+//       console.error(err);
+//       return res.status(500).json({ error: 'Database error' });
+//     }
+//     res.json(results);
+//   });
+// });
+
+// // 🔹 GET single todo
+// app.get('/todos/:id', (req, res) => {
+//   const id = req.params.id;
+//   db.query('SELECT * FROM todos WHERE id = ?', [id], (err, results) => {
+//     if (err) {
+//       console.error(err);
+//       return res.status(500).json({ error: 'Database error' });
+//     }
+
+//     if (results.length === 0) {
+//       return res.status(404).json({ error: 'Todo not found' });
+//     }
+
+//     res.json(results[0]);
+//   });
+// });
+
+// // 🔹 CREATE todo
+// app.post('/todos', (req, res) => {
+//   const { name, description } = req.body;
+
+//   if (!name || !description) {
+//     return res.status(400).json({ error: 'Name and description are required' });
+//   }
+
+//   db.query(
+//     'INSERT INTO todos (name, description) VALUES (?, ?)',
+//     [name, description],
+//     (err, result) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: 'Insert failed' });
+//       }
+
+//       res.status(201).json({
+//         id: result.insertId,
+//         name,
+//         description
+//       });
+//     }
+//   );
+// });
+
+// // 🔹 UPDATE todo
+// app.put('/todos/:id', (req, res) => {
+//   const id = req.params.id;
+//   const { name, description } = req.body;
+
+//   db.query(
+//     'UPDATE todos SET name = ?, description = ? WHERE id = ?',
+//     [name, description, id],
+//     (err, result) => {
+//       if (err) {
+//         console.error(err);
+//         return res.status(500).json({ error: 'Update failed' });
+//       }
+
+//       if (result.affectedRows === 0) {
+//         return res.status(404).json({ error: 'Todo not found' });
+//       }
+
+//       res.json({ id, name, description });
+//     }
+//   );
+// });
+
+// // 🔹 DELETE todo
+// app.delete('/todos/:id', (req, res) => {
+//   const id = req.params.id;
+
+//   db.query('DELETE FROM todos WHERE id = ?', [id], (err, result) => {
+//     if (err) {
+//       console.error(err);
+//       return res.status(500).json({ error: 'Delete failed' });
+//     }
+
+//     if (result.affectedRows === 0) {
+//       return res.status(404).json({ error: 'Todo not found' });
+//     }
+
+//     res.json({ message: 'Deleted successfully' });
+//   });
+// });
+
+// // ===============================
+// // SERVER START
+// // ===============================
+// const PORT = 3000;
+// const HOST = ip.address();
+
+// app.listen(PORT, HOST, () => {
+//   console.log(`🚀 Server running at http://${HOST}:${PORT}`);
+// });
+//------------------------------------------
+//Version 02
+require("dotenv").config();
+
+const express = require("express");
+const cors = require("cors");
+const mysql = require("mysql2");
 
 const app = express();
 
-// Middleware
+// ===============================
+// MIDDLEWARE
+// ===============================
 app.use(cors());
 app.use(express.json());
 
 // ===============================
-// MySQL Connection (Pool)
+// MYSQL CONNECTION (POOL)
 // ===============================
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'SmeyKh',
-  password: 'hello123(*)', // change if you have password
-  database: 'todo_db',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0
 });
 
-// Test DB connection
+// ===============================
+// TEST DB CONNECTION
+// ===============================
 db.getConnection((err, connection) => {
   if (err) {
-    console.error('❌ Database connection failed:', err);
+    console.error("❌ Database connection failed:", err.message);
   } else {
-    console.log('✅ Connected to MySQL');
+    console.log("✅ Connected to MySQL Database");
     connection.release();
   }
 });
@@ -100,27 +251,26 @@ db.getConnection((err, connection) => {
 // ===============================
 
 // 🔹 GET all todos
-app.get('/todos', (req, res) => {
-  db.query('SELECT * FROM todos', (err, results) => {
+app.get("/todos", (req, res) => {
+  db.query("SELECT * FROM todos", (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Database error' });
+      return res.status(500).json({ error: "Database error" });
     }
     res.json(results);
   });
 });
 
-// 🔹 GET single todo
-app.get('/todos/:id', (req, res) => {
+// 🔹 GET todo by ID
+app.get("/todos/:id", (req, res) => {
   const id = req.params.id;
-  db.query('SELECT * FROM todos WHERE id = ?', [id], (err, results) => {
+
+  db.query("SELECT * FROM todos WHERE id = ?", [id], (err, results) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Database error' });
+      return res.status(500).json({ error: "Database error" });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ error: 'Todo not found' });
+      return res.status(404).json({ error: "Todo not found" });
     }
 
     res.json(results[0]);
@@ -128,20 +278,19 @@ app.get('/todos/:id', (req, res) => {
 });
 
 // 🔹 CREATE todo
-app.post('/todos', (req, res) => {
+app.post("/todos", (req, res) => {
   const { name, description } = req.body;
 
   if (!name || !description) {
-    return res.status(400).json({ error: 'Name and description are required' });
+    return res.status(400).json({ error: "Name and description required" });
   }
 
   db.query(
-    'INSERT INTO todos (name, description) VALUES (?, ?)',
+    "INSERT INTO todos (name, description) VALUES (?, ?)",
     [name, description],
     (err, result) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Insert failed' });
+        return res.status(500).json({ error: "Insert failed" });
       }
 
       res.status(201).json({
@@ -154,21 +303,20 @@ app.post('/todos', (req, res) => {
 });
 
 // 🔹 UPDATE todo
-app.put('/todos/:id', (req, res) => {
+app.put("/todos/:id", (req, res) => {
   const id = req.params.id;
   const { name, description } = req.body;
 
   db.query(
-    'UPDATE todos SET name = ?, description = ? WHERE id = ?',
+    "UPDATE todos SET name = ?, description = ? WHERE id = ?",
     [name, description, id],
     (err, result) => {
       if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Update failed' });
+        return res.status(500).json({ error: "Update failed" });
       }
 
       if (result.affectedRows === 0) {
-        return res.status(404).json({ error: 'Todo not found' });
+        return res.status(404).json({ error: "Todo not found" });
       }
 
       res.json({ id, name, description });
@@ -177,29 +325,27 @@ app.put('/todos/:id', (req, res) => {
 });
 
 // 🔹 DELETE todo
-app.delete('/todos/:id', (req, res) => {
+app.delete("/todos/:id", (req, res) => {
   const id = req.params.id;
 
-  db.query('DELETE FROM todos WHERE id = ?', [id], (err, result) => {
+  db.query("DELETE FROM todos WHERE id = ?", [id], (err, result) => {
     if (err) {
-      console.error(err);
-      return res.status(500).json({ error: 'Delete failed' });
+      return res.status(500).json({ error: "Delete failed" });
     }
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Todo not found' });
+      return res.status(404).json({ error: "Todo not found" });
     }
 
-    res.json({ message: 'Deleted successfully' });
+    res.json({ message: "Deleted successfully" });
   });
 });
 
 // ===============================
-// SERVER START
+// SERVER START (CLOUD READY)
 // ===============================
-const PORT = 3000;
-const HOST = ip.address();
+const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, HOST, () => {
-  console.log(`🚀 Server running at http://${HOST}:${PORT}`);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
